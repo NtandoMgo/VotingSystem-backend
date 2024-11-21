@@ -150,17 +150,42 @@ app.get('/results', async (req, res) => {
 });
 
 // Endpoint to add a new candidate
+// app.post('/addCandidate', async (req, res) => {
+//   const { name } = req.body;
+  
+//   if (!name) {
+//     return res.status(400).send({ message: 'Candidate name is required' });
+//   }
+
+//   try {
+//     // Insert a new candidate with 0 votes initially
+//     const result = await candidatesCollection.insertOne({
+//       name,
+//       votes: 0, // Initialize with 0 votes
+//     });
+
+//     res.status(201).send({
+//       candidateId: result.insertedId,
+//       name,
+//       votes: 0,
+//     });
+//   } catch (error) {
+//     console.error('Error adding candidate:', error);
+//     res.status(500).send({ message: 'Failed to add candidate' });
+//   }
+// });
+
 app.post('/addCandidate', async (req, res) => {
-  const { name } = req.body;
+  const { name, imageBase64 } = req.body; // Accept image in base64 format
   
   if (!name) {
     return res.status(400).send({ message: 'Candidate name is required' });
   }
 
   try {
-    // Insert a new candidate with 0 votes initially
     const result = await candidatesCollection.insertOne({
       name,
+      image: imageBase64,  // Store the image base64 data
       votes: 0, // Initialize with 0 votes
     });
 
