@@ -1,11 +1,13 @@
 // Import required libraries
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { MongoClient, ObjectId } = require('mongodb');
 
 // MongoDB connection string (updated to use votingDB)
-const mongoURI = 'mongodb+srv://devvarietyverse:NvBLyIoOqFRdvUyT@votesystem.r517q.mongodb.net/?retryWrites=true&w=majority&appName=VoteSystem';
+const mongoURI = process.env.MONGO_CONN_URI;
+const PORT = process.env.PORT || 5000;
 
 // Initialize MongoDB client
 const client = new MongoClient(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -220,7 +222,6 @@ app.post('/vote', async (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
