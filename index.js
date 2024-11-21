@@ -7,7 +7,7 @@ const { MongoClient, ObjectId } = require('mongodb');
 
 // MongoDB connection string (updated to use votingDB)
 const mongoURI = process.env.MONGO_CONN_URI;
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 27017;
 
 // Initialize MongoDB client
 const client = new MongoClient(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -48,11 +48,11 @@ function validateEmail(email) {
 
 // Route: Register a voter
 app.post('/register', async (req, res) => {
-  const { name, email, idNumber } = req.body;
+  const { name, email, idNumber, province } = req.body;
 
   // Validate required fields
-  if (!name || !email || !idNumber) {
-    return res.status(400).send({ message: 'Name, email, and ID number are required' });
+  if (!name || !email || !idNumber || !province) {
+    return res.status(400).send({ message: 'Name, email, ID number, and province are required' });
   }
 
   // Validate email format
@@ -74,7 +74,7 @@ app.post('/register', async (req, res) => {
       // If the voter exists, update their information (name, idNumber, etc.)
       await votersCollection.updateOne(
         { email },  // Find the voter by email
-        { $set: { name, idNumber } }  // Update the name and idNumber
+        { $set: { name, idNumber, province } }  // Update the name, idNumber, and province
       );
       return res.send({ message: 'Registration updated successfully!' });
     }
@@ -91,6 +91,7 @@ app.post('/register', async (req, res) => {
       name,
       email,
       idNumber,
+      province,  // Save province to the database
       hasVoted: false,  // Initially, the voter hasn't voted
     });
 
@@ -115,7 +116,7 @@ app.post('/login', async (req, res) => {
   try {
     // First check if the ID number exists in the admins collection
     const admin = await adminsCollection.findOne({ idNumber });
-
+    
     if (admin) {
       // If the ID number matches an admin, return the role as 'admin'
       return res.send({ message: 'Login successful', role: 'admin' });
