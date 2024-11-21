@@ -220,14 +220,14 @@ app.delete('/removeCandidate/:id', async (req, res) => {
 
 // Route to handle voting
 app.post('/vote', async (req, res) => {
-  const { email, candidateName } = req.body;
+  const { idNumber, candidateName } = req.body;
 
-  if (!email || !candidateName) {
-    return res.status(400).send({ message: 'Email and candidate name are required' });
+  if (!idNumber || !candidateName) {
+    return res.status(400).send({ message: 'ID number and candidate name are required' });
   }
 
   try {
-    const voter = await votersCollection.findOne({ email });
+    const voter = await votersCollection.findOne({ idNumber });
     if (!voter) return res.status(400).send({ message: 'Voter not found. Please register.' });
     if (voter.hasVoted) return res.status(400).send({ message: 'You have already voted' });
 
@@ -238,7 +238,7 @@ app.post('/vote', async (req, res) => {
     await candidatesCollection.updateOne({ name: candidateName }, { $inc: { votes: 1 } });
 
     // Mark voter as having voted
-    await votersCollection.updateOne({ email }, { $set: { hasVoted: true } });
+    await votersCollection.updateOne({ idNumber }, { $set: { hasVoted: true } });
 
     res.send({ message: `Successfully voted for ${candidateName}` });
   } catch (err) {
